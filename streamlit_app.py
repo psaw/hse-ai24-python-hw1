@@ -1,17 +1,25 @@
 import streamlit as st
 import asyncio
+import time
 from src.services.analysis_service import AnalysisService
 from src.services.weather_service import WeatherService
 from src.utils import load_csv_async
-from src.config import DEFAULT_CITY, PLOT_FIGSIZE, TEMPERATURE_COLORS, OPENWEATHER_API_KEY
-from main import print_temperature_info
+from src.config import (
+    DEFAULT_CITY,
+    PLOT_FIGSIZE,
+    TEMPERATURE_COLORS,
+    OPENWEATHER_API_KEY
+)
+
+
+st.cache_data.clear()
 
 
 async def main():
     st.title("Анализ температурных данных")
 
     # Загрузка данных
-    uploaded_file = st.file_uploader("Загрузите файл с данными", type=['csv'])
+    uploaded_file = st.file_uploader("Загрузите файл с историческими данными", type=['csv'])
 
     if uploaded_file is not None:
         success, message, df = await load_csv_async(uploaded_file)
@@ -33,8 +41,15 @@ async def main():
         # Анализ данных
         analysis = await AnalysisService.analyze_city_temperature(df, selected_city)
 
+        # Добавляем timestamp к ключу, чтобы сбросить кэш при перезапуске
+        # cache_key = f"api_key_{int(time.time())}"
         # Получить от пользователя API ключ
-        api_key = st.text_input("Введите API ключ OpenWeatherMap", value=OPENWEATHER_API_KEY)
+        api_key = st.text_input(
+            "Введите API ключ OpenWeatherMap",
+            value=OPENWEATHER_API_KEY,
+            # key=cache_key,
+            type="password"  # Скрываем ключ звездочками
+        )
 
         if api_key:
             # Получение текущей температуры
@@ -61,7 +76,7 @@ def display_results(analysis, weather_info):
     print(
         f"Текущая температура в {analysis.city}: {weather_info.temperature}°C "
         f"({status} для текущего сезона)"
-    ) 
+    )
 
 
 if __name__ == "__main__":

@@ -6,9 +6,13 @@ from typing import Dict, Optional
 from src.config import DATA_DIR, DEFAULT_CITY, OPENWEATHER_API_KEY
 from src.services.analysis_service import AnalysisService
 from src.services.weather_service import WeatherService
-# from src.utils import is_temperature_anomaly
 
-async def print_temperature_info(city: str, analysis: AnalysisService, weather_info: WeatherService) -> None:
+
+async def print_temperature_info(
+    city: str,
+    analysis: AnalysisService,
+    weather_info: WeatherService
+) -> None:
     """Вывод информации о температуре."""
     if weather_info.error:
         print(f"Ошибка при получении температуры: {weather_info.error}")
@@ -27,7 +31,7 @@ async def print_city_analysis(city: str, analysis: AnalysisService) -> None:
     print(f"\nОбщее количество аномалий: {analysis.anomalies_count}")
 
 
-async def main():
+async def main2():
     # Загружаем данные
     data_path = DATA_DIR / 'temperature_data.csv'
     df = pd.read_csv(data_path)
@@ -35,7 +39,7 @@ async def main():
 
     # Получаем список городов
     cities = df['city'].unique()
-    
+
     # Анализируем данные для каждого города
     analyses = {}
     for city in cities:
@@ -51,9 +55,11 @@ async def main():
 
     # Получаем текущую температуру
     weather_service = WeatherService()
-    
+
     # Асинхронный запрос текущей температуры
-    current_weather = await weather_service.get_current_temperature(city, city_analysis, OPENWEATHER_API_KEY)
+    current_weather = await weather_service.get_current_temperature(
+        city, city_analysis, OPENWEATHER_API_KEY
+    )
 
     # # Проверка на аномалию
     # is_anomaly = is_temperature_anomaly(
@@ -66,4 +72,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(main2())
