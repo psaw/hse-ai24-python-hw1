@@ -1,9 +1,8 @@
 pandas
-numpy
 matplotlib
 python-dotenv
 aiohttp
-httpx
+aiofiles
 loguru
 streamlit
 seaborn
