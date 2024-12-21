@@ -32,4 +32,4 @@ TEMPERATURE_COLORS: Final[dict] = {
 }
 
 # Кэширование
-CACHE_TTL: Final[int] = 300  # секунды
+CACHE_TTL_SECONDS: Final[int] = 300  # время жизни кэша в секундах (5 минут)

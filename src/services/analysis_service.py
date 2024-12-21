@@ -1,12 +1,12 @@
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import Dict
 import pandas as pd
 from src.config import ROLLING_WINDOW, ANOMALY_THRESHOLD
-from src.core.logger import logger
 
 
 @dataclass
 class TemperatureAnalysis:
+    """Класс для хранения результатов анализа температуры."""
     city: str
     seasonal_stats: pd.DataFrame
     data: pd.DataFrame
@@ -14,10 +14,26 @@ class TemperatureAnalysis:
 
 
 class AnalysisService:
+    """Сервис для анализа температурных данных."""
+
     @staticmethod
-    async def analyze_city_temperature(df: pd.DataFrame,
-                                       city: str) -> TemperatureAnalysis:
-        """Анализ температурных данных для конкретного города"""
+    async def analyze_all_cities_temperature(
+        df: pd.DataFrame
+    ) -> Dict[str, TemperatureAnalysis]:
+        """Анализ температурных данных для всех городов."""
+        cities = df['city'].unique()
+        analyses = {}
+        for city in cities:
+            analysis = await AnalysisService.analyze_city_temperature(df, city)
+            analyses[city] = analysis
+        return analyses
+
+    @staticmethod
+    async def analyze_city_temperature(
+        df: pd.DataFrame,
+        city: str
+    ) -> TemperatureAnalysis:
+        """Анализ температурных данных для конкретного города."""
         city_data = df[df['city'] == city].copy()
 
         # Вычисление скользящего среднего
@@ -41,9 +57,9 @@ class AnalysisService:
             season_mask = city_data['season'] == season
             city_data.loc[season_mask, 'is_anomaly'] = (
                 (city_data.loc[season_mask, 'temperature'] >
-                 mean + ANOMALY_THRESHOLD*std) |
+                 mean + ANOMALY_THRESHOLD * std) |
                 (city_data.loc[season_mask, 'temperature'] <
-                 mean - ANOMALY_THRESHOLD*std)
+                 mean - ANOMALY_THRESHOLD * std)
             )
 
         return TemperatureAnalysis(

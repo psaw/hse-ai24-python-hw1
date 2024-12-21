@@ -39,15 +39,3 @@ logger.add(
     backtrace=True,
     diagnose=True
 )
-
-# # Отдельный файл для API запросов
-# logger.add(
-#     LOG_DIR / "api.log",
-#     format=LOG_FORMAT,
-#     level=LOG_LEVEL,
-#     rotation="1 day",
-#     retention=LOG_RETENTION_DAYS,
-#     compression="zip",
-#     encoding="utf-8",
-#     filter=lambda record: "api" in record["extra"]
-# )
